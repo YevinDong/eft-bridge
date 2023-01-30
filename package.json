@@ -1,0 +1,32 @@
+{
+  "name": "eft-bridge",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/src/index.ts",
+  "jsnext:main": "lib/src/index.js",
+  "scripts": {
+    "clear": "node commands/clear.js",
+    "build": "npm run clear && tsc --version && tsc && node commands/cp.js",
+    "build:pack": "npm run build && npm pack",
+    "release": "node commands/release.js",
+    "test": "parcel ./test.html",
+    "test:build": "parcel build ./test.html --experimental-scope-hoisting"
+  },
+  "types": "./lib/src/index.d.ts",
+  "files": [
+    "lib",
+    "README.md",
+    "package.json"
+  ],
+  "devDependencies": {
+    "chalk": "^4.1.0",
+    "cssnano": "^5.1.14",
+    "inquirer": "^7.3.3",
+    "log-symbols": "^4.0.0",
+    "postcss": "^8.2.15",
+    "shelljs": "^0.8.5",
+    "typescript": "^4.9.4"
+  },
+  "author": "",
+  "license": "ISC"
+}
