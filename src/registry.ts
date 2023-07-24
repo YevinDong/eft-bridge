@@ -1,3 +1,4 @@
+import { kindof } from "./utils"
 let origin_bridge: Window['WebViewJavascriptBridge'] = null;
 const FN_NAME = {
     JS_CALL_NATIVE: "jsCallNative",
@@ -11,7 +12,7 @@ export interface I_BRIDGE {
     on: any,
     off: any
 }
-const native_call_js_buckte: Map<string, Set<(res: any) => any>> = new Map();
+const native_call_js_bucket: Map<string, Set<(res: any) => Record<string, any>>> = new Map();
 let bridge: I_BRIDGE = {} as I_BRIDGE;
 export function init(): I_BRIDGE {
     if (origin_bridge) {
@@ -52,27 +53,43 @@ function initNativeCallJs() {
         console.log('native all js : ', data.opt);
         if (data && data.opt) {
             const { opt } = data;
-            const fns = native_call_js_buckte.get(opt);
+            const fns = native_call_js_bucket.get(opt);
 
             if (fns && fns?.size) {
+                let res = []
+                let size = fns.size;
+                let i = 0;
                 fns.forEach(async (fn) => {
-                    if (typeof fn === 'function')
-                        await fn(data);
+                    let index = i++;
+                    if (typeof fn === 'function') {
+                        let ans = await fn(data);
+                        if (kindof(ans) !== 'object') ans = { res: ans }
+                        res[index] = ans;
+                    } else {
+                        res[index] = { error: 'fn is not a function' };
+                    }
+
+                    if (i === size) {
+                        if (res.length === 1) next(res[0]);
+                        else next({ res })
+                    }
                 })
+
             }
+        } else {
+            next({ error: 'opt is not exist' });
         }
-        next();
     })
 }
 
 function bridgeOn(event: string, cb: (res: any) => any) {
-    if (!native_call_js_buckte.has(event)) {
-        native_call_js_buckte.set(event, new Set());
+    if (!native_call_js_bucket.has(event)) {
+        native_call_js_bucket.set(event, new Set());
     }
-    native_call_js_buckte.get(event).add(cb);
+    native_call_js_bucket.get(event).add(cb);
 }
 
 function bridgeOff(event: string, cb: any) {
-    const fns = native_call_js_buckte.get(event);
+    const fns = native_call_js_bucket.get(event);
     if (fns?.size) fns.delete(cb);
 }

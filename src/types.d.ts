@@ -3,7 +3,7 @@ declare interface Window {
         callHandler: (callHundlerName: string, data: Record<string, any>, cb: (res: any) => void) => void;
         registerHandler: (
             registerHandlerName: string,
-            cb: (data: any, next: () => void) => void
+            cb: (data: any, next: (res: undefined | Record<string, any>) => void) => void
         ) => void;
     }
 }
