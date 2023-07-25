@@ -2,7 +2,7 @@
   "name": "eft-bridge",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/src/index.ts",
+  "main": "lib/src/index.js",
   "jsnext:main": "lib/src/index.js",
   "scripts": {
     "clear": "node commands/clear.js",
