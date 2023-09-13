@@ -2,7 +2,7 @@ import { getIsApp } from "./utils";
 import { version } from "../package.json";
 import { init as registryInit, type I_BRIDGE } from "./registry";
 const isApp = getIsApp();
-const readyBuckte = [];
+const readyBucket = [];
 export interface BRIDGE_EXPORT {
     bridge: I_BRIDGE,
     isInit: boolean,
@@ -27,22 +27,24 @@ export function useBridge() {
         _export.isApp = isApp;
         _export.bridge = registryInit();
     }
-    // # 不管是否是app中都消费掉Buckte中得函数
-    consumeReadyBuckte();
+    // # 不管是否是app中都消费掉Bucket中得函数
+    consumeReadyBucket();
     return _export
 }
 
-function consumeReadyBuckte() {
-    while (readyBuckte.length) {
-        const fn = readyBuckte.shift();
+function consumeReadyBucket() {
+    while (readyBucket.length) {
+        const fn = readyBucket.shift();
         typeof fn === 'function' && fn(_export);
     }
 }
 export function ready(fn: (bridge: BRIDGE_EXPORT) => any): void {
     if (typeof fn !== 'function') return;
     if (_export.isInit) fn(_export);
-    else readyBuckte.push(fn);
+    else {
+        readyBucket.push(fn);
+        useBridge();
+    }
     return void 0;
 }
 export default useBridge;
-
